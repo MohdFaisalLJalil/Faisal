@@ -1,0 +1,56 @@
+P=input('P= power rating of the machinein MW  ');
+V=input('V= Rated line to line terminal voltage of the machine in KV  ');
+pf=input('pf= power factor at which voltage regulation is to be calculated  ');
+Isc=input('Isc= short circuit current from short circuit test data  ');
+Ifsc=input('Ifsc =field current corresponding to short circuit current from short circuit test data  ');
+m=input('m= the number of readings in occ test');
+for i=1:m
+    If(i)=input('If(i)= the value of field current from occ test  ')
+end
+for i=1:m
+    Voc(i)=input('Voc(i)= the value of open circuit voltage from occ test  ')
+end
+x=0;
+while x==0
+    plot(If,Voc) %plot open circuit characteristic from oc test data
+    grid minor
+    %get the value of field current from occ graph by putting cursor corresponding 
+    %to rated terminal voltage i.e. 13KV
+    [If1,Voc1]=ginput(1)
+    x=input('if the value If1 obtained from the graph does not correspond to 13 KV then continue clicking on the graph at ordinate corresponding to 13 and for that type 0    ')
+end
+% calculate the short circuit current corresponding to the
+% field current obtained above this is valid because SCC is a linear characteristic. 
+Isc1=If1*Isc/Ifsc; 
+% calculate synchronous reactance as 
+% Xs=(rated per phase terminal voltage)/(short circuit armature current for
+% the same value of field current)
+Xs=V*1000/(sqrt(3)*Isc1); 
+%rated armature current=(power rating)/(sqrt(3)xpower factor x rated line voltage)
+Iarated=(P*10^6)/(sqrt(3)*pf*V*1000);
+% phase voltage=line voltage/sqrt(3)
+Vt=V*1000/sqrt(3);
+% Current phasor = Ia cos(theta)-jIa sin(theta), here power factor(pf)=cos(theta)
+Iaratedphasor=Iarated*(pf-j*sin(acos(pf)));
+% excitation voltage(phasor) = per phase terminal voltage(phasor) + j x current phasor x synchronous reactance,
+% here terminal voltage is taken as reference phasor
+Ef=Vt+j*Iaratedphasor*Xs;
+% magnitude of excitation voltage 
+Efmag=sqrt((real(Ef))^2+(imag(Ef))^2);
+% line to line excitation voltage
+Efline=Efmag*sqrt(3); 
+% the value of field current corresponds to modified air gap line
+If2=(If1/13000)*Efline 
+x=0;
+while x==0
+    plot(If,Voc) % corresponding to field current(If2) calculated above the value of open circuit
+    grid minor % voltage (Voc2)is obtained from the OCC
+    [If2,Voc2]=ginput(1)
+    x=input('if the value Voc2 obtained from the graph does not correspond to If2 calculated then continue clicking on the graph at abcissa corresponding If2 and for that type 0    ')
+end
+% per unit voltage regulation = ( Voc - rated terminal voltage)/ Voc
+VR=(Voc2-V)/V*100; 
+sprintf('synchronous reactance = %f ohms ', Xs) 
+sprintf('Rated armature current = %f amperes ',Iarated) 
+sprintf('line to line excitation voltage = %f Volts ',Efline) 
+sprintf('Percentage voltage regulation = %f % ',VR) 
