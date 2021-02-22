@@ -1,0 +1,52 @@
+%A program to plot the torque speed characteristic
+s =linspace(.001,1,100);
+R1=input('enter the value of stator resistance,R1=     ohms');
+x1=input('enter the value of stator reactance,x1=     ');
+R2=input('enter the value of rotor resistance,R2=     ');
+x2=input('enter the value of rotor  reactance,x2=     ');
+xm=input('enter the value of magnetising reactance,xm=   ');
+f=input('enter the value of supply frequency,f=           ');
+p=input('enter the value of number of poles,p=    ');
+v=input('enter the value of supply voltage,v=     ');
+y=input('enter the value of slip,s1   ');
+%z1=0.3+0.6*j;
+%z2=0.25+0.6*j;
+%zm=35*j;
+%v=400;
+%f=50;
+%p=4;
+%r1=real(z1);
+%r2=real(z2);
+%x1=imag(z1);
+%x2=imag(z2);
+%xm=imag(zm);
+V=v/sqrt(3);
+ns=120*f/p;
+ws=2*pi*f;
+vth=xm*V/(x1+xm);
+Rth=R1*xm/(x1+xm);
+xth=x1*xm/(x1+xm);
+for i=1:length(s)
+    Te(i)=3*vth^2*R2/(ws*s(i)*((Rth+R2/s(i))^2+(xth+x2)^2));
+end
+nr=(1-s)*ns;
+nr_percent=nr/ns*100;
+T1=3*vth^2*R2/(ws*y*((Rth+R2/y)^2+(xth+x2)^2));
+sprintf('Torque corresponding to the value of slip entered(s1) = %f Nm',T1)
+plot(nr_percent,Te);
+xlabel('\bfROTOR SPEED (percent of synchronous speed)')
+ylabel('\bfTORQUE PRODUCED (N-M)')
+title('\bfTORQUE SPEED CHARACTERISTICS OF AN INDUCTION MOTOR');
+[tmax nn]=max(Te);
+Tmax=num2str(tmax);
+Ntmax=num2str(nr(nn));
+smax=num2str(s(nn));
+text(nr_percent(nn+10),tmax/1.2,['\bfTmax=',Tmax])
+text(nr_percent(nn+10),tmax/1.4,['\bfAt Speed=',Ntmax])
+text(nr_percent(nn+10),tmax/1.6,['\bfAt Slip(smax)=',smax])
+grid minor
+[percent_speed,Torque]=ginput(1);
+sprintf('percent_speed corresponding to the clicked point = %f % ',percent_speed)
+sprintf('Torque corresponding to the clicked point = %f Nm ',Torque)
+sprintf('Maximum Torque = %f Nm',tmax)
+sprintf('Slip at maximum torque = %f ',s(nn))
